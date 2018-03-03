@@ -1,15 +1,19 @@
 export default class IceAndFireUtils {
-    
-    getRouteUrl = (url) => {
+
+    static getRouteUrl = (url) => {
         const apiRegex = /\/[a-z]+\/[0-9]+/g
 
-        const matchArray = apiRegex.exec(url) || []
+        let matchArray = apiRegex.exec(url) || []
 
-        if (matchArray.length > 0) {
-            return matchArray[0]
-        } else {
-            return ""
-        }
+        return matchArray.length > 0 ? matchArray[0] : ""
+    }
+
+    static getIdFromUrl = (url) => {
+        const idRegex = /(\d+)/g
+
+        let match = idRegex.exec(url) || []
+
+        return match.length > 0 ? match[0] : ""
     }
 
 }

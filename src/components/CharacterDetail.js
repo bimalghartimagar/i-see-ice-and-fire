@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import IceAndFireService from '../services/IceAndFireApiService';
 import { TitleWithBody } from './BooksDetail';
-import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
-import Button from 'material-ui/Button';
+import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
+import { connect } from 'react-redux'
+
+import { fetchItemsIfNeeded, selectedItem } from '../actions/actions';
 
 const styles = theme => ({
     card: {
@@ -37,7 +37,6 @@ const styles = theme => ({
     }),
     root: {
         width: '100%',
-        // maxWidth: 360,
         backgroundColor: theme.palette.background.paper,
     },
 });
@@ -45,115 +44,89 @@ const styles = theme => ({
 class CharacterDetail extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            character: {},
-            loading: true
-        }
-        this.apiService = new IceAndFireService();
+
         this.classes = props.classes;
     }
 
     componentDidMount() {
 
-        this.apiService.getFireAndIceDetail('characters', this.props.match.params.characterid)
-            .then(data =>
-                this.setState(
-                    {
-                        character: data,
-                        loading: false
-                    }
-                )
-            )
+        const { dispatch, match } = this.props
+        dispatch(fetchItemsIfNeeded('characters')).then(x => dispatch(selectedItem('characters', match.params.characterid)))
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.match.params.characterid !== nextProps.match.params.characterid) {
-            this.setState({
-                character: {},
-                loading: true
-            })
 
-            this.apiService.getFireAndIceDetail('characters', nextProps.match.params.characterid)
-                .then(data =>
-                    this.setState(
-                        {
-                            character: data,
-                            loading: false
-                        }
-                    )
-                )
+            const { dispatch } = this.props
+            dispatch(fetchItemsIfNeeded('characters')).then(x => dispatch(selectedItem('characters', nextProps.match.params.characterid)))
         }
     }
 
     render() {
 
-        if (this.state.loading) {
-            return (<div>Loading...</div>)
-        }
+
+        const { character } = this.props
 
         return (
-            // <div>
-            //     Character Detail
-            // <ul>
-            //         <li><h4>Name:</h4>{this.state.character.name}</li>
-            //         <li><h4>Born on:</h4>{this.state.character.born}</li>
-            //         <li>
-            //             <h4>Also known as:</h4>
-            //             <ul>
-            //                 {this.state.character.aliases.map(alias => <li>{alias}</li>)}
-            //             </ul>
-            //         </li>
-            //         <li><h4>Gender:</h4>{this.state.character.gender}</li>
-            //         <li><h4>Culture:</h4>{this.state.character.culture}</li>
-            //     </ul>
-            // </div>
-
             <div className={this.classes.root}>
                 <Paper className={this.classes.rootPaper} elevation={4}>
                     <Typography variant="headline" component="h2">
                         Character Detail
     </Typography>
                 </Paper>
-                <Card className={this.classes.card}>
-                    <CardContent>
-                        {/* <Typography className={this.classes.title}>Books Detail</Typography> */}
-                        <Typography variant="headline" component="h2">
-                            {this.state.character.name}
-                        </Typography>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>Also Known as: </span><ul>
-                            {this.state.character.aliases.map(alias => <li>{alias}</li>)}
-                        </ul></Typography>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>Titles: </span><ul>
-                            {this.state.character.titles.map(title => <li>{title}</li>)}
-                        </ul></Typography>
-                        <TitleWithBody {...this.classes} title={'Born on: '} body={this.state.character.born}></TitleWithBody>
-                        <TitleWithBody {...this.classes} title={'Gender: '} body={this.state.character.gender}></TitleWithBody>
-                        <TitleWithBody {...this.classes} title={'Culture: '} body={this.state.character.culture}></TitleWithBody>
-                        <TitleWithBody {...this.classes} title={'Father: '} body={this.state.character.father}></TitleWithBody>
-                        <TitleWithBody {...this.classes} title={'Mother: '} body={this.state.character.mother}></TitleWithBody>
-                        <TitleWithBody {...this.classes} title={'Spouse: '} body={this.state.character.spouse}></TitleWithBody>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>Allegiances: </span><ul>
-                            {this.state.character.allegiances.map(allegiance => <li>{allegiance}</li>)}
-                        </ul></Typography>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>Books: </span><ul>
-                            {this.state.character.books.map(book => <li>{book}</li>)}
-                        </ul></Typography>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>POV Books: </span><ul>
-                            {this.state.character.povBooks.map(book => <li>{book}</li>)}
-                        </ul></Typography>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>TV Series: </span><ul>
-                            {this.state.character.tvSeries.map(series => <li>{series}</li>)}
-                        </ul></Typography>
-                        <Typography component="p" variant="subheading" gutterBottom><span className={this.classes.bold}>Played By: </span><ul>
-                            {this.state.character.playedBy.map(played => <li>{played}</li>)}
-                        </ul></Typography>
-                    </CardContent>
-                    {/* <CardActions>
+
+                {Object.keys(character).length !== 0 && character.constructor === Object &&
+
+                    <Card className={this.classes.card}>
+                        <CardContent>
+                            <Typography variant="headline" component="h2">
+                                {character.name}
+                            </Typography>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Also Known as: </span><ul>
+                                {character.aliases.map(alias => <li key={alias}>{alias}</li>)}
+                            </ul></Typography>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Titles: </span><ul>
+                                {character.titles.map(title => <li key={title}>{title}</li>)}
+                            </ul></Typography>
+                            <TitleWithBody {...this.classes} title={'Born on: '} body={character.born}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Gender: '} body={character.gender}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Culture: '} body={character.culture}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Father: '} body={character.father}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Mother: '} body={character.mother}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Spouse: '} body={character.spouse}></TitleWithBody>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Allegiances: </span><ul>
+                                {character.allegiances.map(allegiance => <li key={allegiance}>{allegiance}</li>)}
+                            </ul></Typography>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Books: </span><ul>
+                                {character.books.map(book => <li key={book}>{book}</li>)}
+                            </ul></Typography>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>POV Books: </span><ul>
+                                {character.povBooks.map(book => <li key={book}>{book}</li>)}
+                            </ul></Typography>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>TV Series: </span><ul>
+                                {character.tvSeries.map(series => <li key={series}>{series}</li>)}
+                            </ul></Typography>
+                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Played By: </span><ul>
+                                {character.playedBy.map(played => <li key={played}><a target="_blank" href={'https://www.google.com/search?q=' + played}>{played}</a></li>)}
+                            </ul></Typography>
+                        </CardContent>
+                        {/* <CardActions>
         <Button size="small">Learn More</Button>
     </CardActions> */}
-                </Card>
+                    </Card>
+                }
             </div>
         )
     }
 }
-export default withStyles(styles)(CharacterDetail);
+
+const mapStateToProps = (state) => {
+    const { selectedItem } = state
+
+    return {
+        character: selectedItem['characters'] || {}
+    }
+}
+
+
+export default withStyles(styles)(connect(mapStateToProps)(CharacterDetail));

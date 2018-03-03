@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+
 import IceAndFireApiService from '../services/IceAndFireApiService'
 import IceAndFireUtils from '../utils/IceAndFireUtils'
+
+// TODO: Change to search for items in redux store and then via api
 class SearchResult extends Component {
 
     constructor(props) {
@@ -13,7 +16,6 @@ class SearchResult extends Component {
             loading: true
         }
         this.apiService = new IceAndFireApiService();
-        this.utils = new IceAndFireUtils();
     }
 
     componentDidMount() {
@@ -50,7 +52,7 @@ class SearchResult extends Component {
         if (selectedType === "All") {
 
             options.slice(1).forEach(element => {
-                this.apiService.getFireAndIceDetail(element.toLowerCase()).then(data => {
+                IceAndFireApiService.getFireAndIceDetail(element.toLowerCase()).then(data => {
                     let results = data.filter(item => item.name.toLowerCase().search(searchText.toLowerCase()) > -1)
                     this.setState({
                         [element.toLowerCase()]: results,
@@ -60,7 +62,7 @@ class SearchResult extends Component {
             });
         }
         else {
-            this.apiService.getFireAndIceDetail(selectedType.toLowerCase()).then(data => {
+            IceAndFireApiService.getFireAndIceDetail(selectedType.toLowerCase()).then(data => {
                 let results = data.filter(item => item.name.toLowerCase().search(searchText.toLowerCase()) > -1)
                 this.setState({
                     [selectedType.toLowerCase()]: results,
@@ -73,7 +75,7 @@ class SearchResult extends Component {
     _bookItems = () => {
         return this.state.books.map(item => {
 
-            var url = this.utils.getRouteUrl(item.url);
+            var url = IceAndFireUtils.getRouteUrl(item.url);
             return <li key={item.name} ><Link
                 to={url}
             >
@@ -85,7 +87,7 @@ class SearchResult extends Component {
     }
     _characterItems = () => {
         return this.state.characters.map(item => {
-            var url = this.utils.getRouteUrl(item.url);
+            var url = IceAndFireUtils.getRouteUrl(item.url);
             return <li key={item.name} ><Link
                 to={url}
             >
@@ -97,7 +99,7 @@ class SearchResult extends Component {
     }
     _houseItems = () => {
         return this.state.houses.map(item => {
-            var url = this.utils.getRouteUrl(item.url);
+            var url = IceAndFireUtils.getRouteUrl(item.url);
             return <li key={item.name} ><Link
                 to={url}
             >
@@ -116,19 +118,19 @@ class SearchResult extends Component {
 
         return (
             <div>
-                <h3>Search Results</h3>
+                <h3>Search Results for '{this.props.history.location.state.searchText}'</h3>
                 Books
                 <span></span>
                 <ul>
-                    {this._bookItems().length>0?this._bookItems():<li>No results found.</li>}
+                    {this._bookItems().length > 0 ? this._bookItems() : <li>No results found.</li>}
                 </ul>
                 Houses
                 <ul>
-                    {this._houseItems().length>0?this._houseItems():<li>No results found.</li>}
+                    {this._houseItems().length > 0 ? this._houseItems() : <li>No results found.</li>}
                 </ul>
                 Characters
                 <ul>
-                    {this._characterItems().length>0?this._characterItems():<li>No results found.</li>}
+                    {this._characterItems().length > 0 ? this._characterItems() : <li>No results found.</li>}
                 </ul>
             </div>
         )

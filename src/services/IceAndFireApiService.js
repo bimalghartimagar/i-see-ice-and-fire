@@ -1,17 +1,15 @@
-class IceAndFireIceAndFireApiService {
+class IceAndFireApiService {
     requestObject = {
         method: 'GET',
         headers: {
-            'Accept':  'application/vnd.anapioficeandfire+json; version=1'
+            'Accept': 'application/vnd.anapioficeandfire+json; version=1'
         }
     }
-    async getFireAndIceDetail(type, id="",page="",pageSize="",queryParam=""){
-        const url = `https://www.anapioficeandfire.com/api/${type}${"/"+id}${"?"+queryParam}`;
+    static getFireAndIceDetail(type, id = "", page = "", pageSize = "", queryParam = "") {
+        let url = `https://www.anapioficeandfire.com/api/${type}${"/" + id}${"?" + queryParam}`;
 
-        let response = await fetch(url, this.requestObject).then(response=>response.json())
-
-        return response;
+        return fetch(url, this.requestObject).then(response => response.json())
     }
 }
 
-export default IceAndFireIceAndFireApiService
+export default IceAndFireApiService

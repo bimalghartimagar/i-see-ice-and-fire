@@ -1,7 +1,49 @@
 import React, { Component } from 'react';
 import Link from 'react-router-dom/Link';
+import { connect } from 'react-redux'
+import Paper from 'material-ui/Paper';
+import Typography from 'material-ui/Typography';
+import Card, { CardContent } from 'material-ui/Card';
+
 import IceAndFireApiService from '../services/IceAndFireApiService';
 import IceAndFireUtils from '../utils/IceAndFireUtils';
+import { fetchItemsIfNeeded, selectedItem } from '../actions/actions';
+import { TitleWithBody } from './BooksDetail';
+import { withStyles } from 'material-ui/styles';
+
+const styles = theme => ({
+    card: {
+        minWidth: 275,
+        marginTop: 5
+    },
+    bullet: {
+        display: 'inline-block',
+        margin: '0 2px',
+        transform: 'scale(0.8)',
+    },
+    title: {
+        marginBottom: 16,
+        fontSize: 14,
+        color: theme.palette.text.secondary,
+    },
+    pos: {
+        marginBottom: 12,
+        color: theme.palette.text.secondary,
+    },
+    bold: {
+        fontWeight: 'bold'
+    },
+    rootPaper: theme.mixins.gutters({
+        paddingTop: 16,
+        paddingBottom: 16,
+        marginTop: theme.spacing.unit * 3,
+    }),
+    root: {
+        width: '100%',
+        backgroundColor: theme.palette.background.paper,
+    },
+});
+
 
 class HouseDetail extends Component {
     constructor(props) {
@@ -12,43 +54,26 @@ class HouseDetail extends Component {
         }
         this.apiService = new IceAndFireApiService();
         this.utils = new IceAndFireUtils();
+        this.classes = props.classes
     }
 
     componentDidMount() {
 
-        this.apiService.getFireAndIceDetail('houses', this.props.match.params.houseid)
-            .then(data => {
-                    this.setState(
-                        {
-                            house: data,
-                            loading: false
-                        }
-                    )
-                    this.getCharacterDetail(data.currentLord)
-                    }
-                )   
+        const { dispatch, match } = this.props
+        dispatch(fetchItemsIfNeeded('characters'))
+            .then(x => dispatch(fetchItemsIfNeeded('houses'))
+                .then(x => dispatch(selectedItem('houses', match.params.houseid))))
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.match.params.houseid !== nextProps.match.params.houseid) {
-            this.setState({
-                house: {},
-                loading: true
-            })
-            this.apiService.getFireAndIceDetail('houses', nextProps.match.params.houseid)
-                .then(data => {
-                    this.setState(
-                        {
-                            house: data,
-                            loading: false
-                        }
-                    )
-                    this.getCharacterDetail(data.currentLord)
-                }
-                )
+
+            const { dispatch } = this.props
+            dispatch(fetchItemsIfNeeded('characters')).then(x => dispatch(selectedItem('houses', nextProps.match.params.houseid)))
         }
     }
 
+    // TODO: Change to search character in store and then via api
     getCharacterDetail = (url) => {
 
         if (url === null || url === "") {
@@ -78,25 +103,45 @@ class HouseDetail extends Component {
     }
 
     render() {
-
-        if (this.state.loading) {
-            return (<div>Loading...</div>)
-        }
-
+        const { house } = this.props
         return (
-            <div>
-                House Detail
-            <ul>
-                    <li><h4>Name:</h4>{this.state.house.name}</li>
-                    <li><h4>Region:</h4>{this.state.house.region}</li>
-                    <li><h4>Founded:</h4>{this.state.house.founded}</li>
-                    <li><h4>Coat of Arms:</h4>{this.state.house.coatOfArms}</li>
-                    <li><h4>Current Lord:</h4><Link to={this.utils.getRouteUrl(this.state.house.currentLord)}> {this.state.house.currentLordName}</Link></li>
+            <div className={this.classes.root}>
+                <Paper className={this.classes.rootPaper} elevation={4}>
+                    <Typography variant="headline" component="h2">
+                        House Detail
+    </Typography>
+                </Paper>
 
-                </ul>
+                {Object.keys(house).length !== 0 && house.constructor === Object &&
+                    <Card className={this.classes.card}>
+                        <CardContent>
+                            <Typography variant="headline" component="h2">
+                                {house.name}
+                            </Typography>
+                            <TitleWithBody {...this.classes} title={'Region: '} body={house.region}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Founded: '} body={house.founded}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Coat of Arms: '} body={house.coatOfArms}></TitleWithBody>
+                            <TitleWithBody {...this.classes} title={'Current Lord: '} body={house.culture}><Link to={IceAndFireUtils.getRouteUrl(house.currentLord)}> {house.currentLordName || ""}</Link></TitleWithBody>
+                        </CardContent>
+                    </Card>
+                }
             </div>
         )
     }
 }
 
-export default HouseDetail;
+const mapStateToProps = (state) => {
+    const { selectedItem, itemsByType } = state
+
+    let house = selectedItem['houses'] || {}
+    if (Object.keys(house).length !== 0 && house.constructor === Object) {
+        let currentLordNameArray = itemsByType['characters'].items.filter(item => IceAndFireUtils.getIdFromUrl(item.url) === IceAndFireUtils.getIdFromUrl(house.currentLord))
+        house.currentLordName = currentLordNameArray.length > 0 ? currentLordNameArray[0].name : ""
+    }
+
+    return {
+        house
+    }
+}
+
+export default withStyles(styles)(connect(mapStateToProps)(HouseDetail));
