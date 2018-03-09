@@ -6,7 +6,7 @@ import CustomListItem from './CustomListItem';
 
 const CustomList = ({ items, passedIcon }) => {
     return (
-        <List>
+        <List dense={true}>
             {
                 items.map(item => <CustomListItem key={item.name} {...item} passedIcon={passedIcon} />)
             }

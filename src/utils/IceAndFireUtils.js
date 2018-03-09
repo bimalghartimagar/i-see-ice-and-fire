@@ -16,4 +16,10 @@ export default class IceAndFireUtils {
         return match.length > 0 ? match[0] : ""
     }
 
+    static getQueryParamAsObject = (dirtyQueryParamArray) => {
+        return (dirtyQueryParamArray.length > 0)
+                    ? new URLSearchParams(dirtyQueryParamArray[0].split('>;')[0])
+                    : new URLSearchParams()
+    }
+
 }

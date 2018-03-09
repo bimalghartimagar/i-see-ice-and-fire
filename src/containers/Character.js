@@ -5,6 +5,8 @@ import Typography from 'material-ui/Typography';
 import { withStyles } from 'material-ui/styles';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
+import { CircularProgress } from 'material-ui/Progress';
+import Button from 'material-ui/Button';
 
 import { fetchItemsIfNeeded } from '../actions/actions';
 import CustomList from '../components/CustomList';
@@ -21,6 +23,12 @@ const styles = theme => ({
         // maxWidth: 360,
         backgroundColor: theme.palette.background.paper,
     },
+    progress: {
+        margin: theme.spacing.unit * 2,
+    },
+    button: {
+        margin: theme.spacing.unit,
+    },
 });
 
 class Character extends Component {
@@ -31,13 +39,26 @@ class Character extends Component {
     }
 
     componentDidMount() {
+        const { dispatch, first } = this.props
+        dispatch(fetchItemsIfNeeded('characters', first))
+    }
+
+    componentWillReceiveProps(nextProps) {
         const { dispatch } = this.props
-        dispatch(fetchItemsIfNeeded('characters'))
+
+        let nextParam = new URLSearchParams(nextProps.location.search)
+        let currentParam = new URLSearchParams(this.props.location.search)
+
+        if (nextParam.get('page') !== currentParam.get('page')) {
+            dispatch(fetchItemsIfNeeded('characters', nextParam.get('page')))
+        }
+
+
     }
 
     render() {
 
-        const { characters, isFetching, lastUpdated } = this.props
+        const { characters, isFetching, lastUpdated, first, last, next, prev } = this.props
         const PassedIcon = () => <PersonIcon />
 
         return (
@@ -47,9 +68,17 @@ class Character extends Component {
                         Characters {characters.length >= 0 && !isFetching && <Typography>Updated on: {(new Date(lastUpdated)).toLocaleString()}</Typography>}
                     </Typography>
                 </Paper>
-                {characters.length === 0 && isFetching && <div>Loading...</div>}
+                {isFetching && <CircularProgress className={this.classes.progress} />}
                 {characters.length === 0 && !isFetching && <div>No characters found.</div>}
-                {characters.length >= 0 && <CustomList items={characters} passedIcon={PassedIcon} />}
+                {characters.length >= 0 &&
+                    <span>
+                        <Button className={this.classes.button} variant="raised" size="small" onClick={() => this.props.history.push('/characters?page=' + first)}>First</Button>
+                        <Button className={this.classes.button} variant="raised" size="small" onClick={() => this.props.history.push('/characters?page=' + prev)}>Prev</Button>
+                        <Button className={this.classes.button} variant="raised" size="small" onClick={() => this.props.history.push('/characters?page=' + next)}>Next</Button>
+                        <Button className={this.classes.button} variant="raised" size="small" onClick={() => this.props.history.push('/characters?page=' + last)}>Last</Button>
+                        <CustomList items={characters} passedIcon={PassedIcon} />
+                    </span>
+                }
             </div>
         )
     }
@@ -61,10 +90,20 @@ const mapStateToProps = (state) => {
     const {
         isFetching,
         lastUpdated,
-        items
+        items,
+        first,
+        last,
+        next,
+        prev,
+        current
     } = itemsByType['characters'] || {
         isFetching: false,
-        items: []
+        items: [],
+        first: 1,
+        last: 1,
+        next: 1,
+        prev: 1,
+        current: 1
     }
 
     items.map(item => {
@@ -75,7 +114,12 @@ const mapStateToProps = (state) => {
     return {
         isFetching,
         characters: items,
-        lastUpdated
+        lastUpdated,
+        first,
+        last,
+        next,
+        prev,
+        current
     }
 }
 

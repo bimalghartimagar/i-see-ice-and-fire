@@ -5,8 +5,19 @@ import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 import { connect } from 'react-redux'
+import KeyboardArrowLeft from 'material-ui-icons/KeyboardArrowLeft';
+import Button from 'material-ui/Button';
+import classNames from 'classnames';
+import Grid from 'material-ui/Grid';
+import Grow from 'material-ui/transitions/Grow';
+import PersonIcon from 'material-ui-icons/Person';
+import TvIcon from 'material-ui-icons/Tv';
+import Chip from 'material-ui/Chip';
+import Avatar from 'material-ui/Avatar';
 
-import { fetchItemsIfNeeded, selectedItem } from '../actions/actions';
+import RecentActorsIcon from 'material-ui-icons/RecentActors';
+
+import { fetchItemsIfNeeded, selectedItem, fetchItemIfNeeded } from '../actions/actions';
 
 const styles = theme => ({
     card: {
@@ -30,14 +41,24 @@ const styles = theme => ({
     bold: {
         fontWeight: 'bold'
     },
-    rootPaper: theme.mixins.gutters({
-        paddingTop: 16,
-        paddingBottom: 16,
-        marginTop: theme.spacing.unit * 3,
-    }),
     root: {
-        width: '100%',
-        backgroundColor: theme.palette.background.paper,
+        flexGrow: 1,
+    },
+    paper: {
+        padding: theme.spacing.unit,
+        color: theme.palette.text.secondary,
+    },
+    leftIcon: {
+        marginRight: theme.spacing.unit,
+    },
+    iconSmall: {
+        fontSize: 20,
+    },
+    button: {
+        margin: theme.spacing.unit,
+    },
+    chip: {
+        margin: theme.spacing.unit,
     },
 });
 
@@ -51,15 +72,19 @@ class CharacterDetail extends Component {
     componentDidMount() {
 
         const { dispatch, match } = this.props
-        dispatch(fetchItemsIfNeeded('characters')).then(x => dispatch(selectedItem('characters', match.params.characterid)))
+        dispatch(fetchItemIfNeeded('characters', match.params.characterid)).then(x => dispatch(selectedItem('characters', match.params.characterid)))
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.match.params.characterid !== nextProps.match.params.characterid) {
 
             const { dispatch } = this.props
-            dispatch(fetchItemsIfNeeded('characters')).then(x => dispatch(selectedItem('characters', nextProps.match.params.characterid)))
+            dispatch(fetchItemIfNeeded('characters', nextProps.match.params.characterid)).then(x => dispatch(selectedItem('characters', nextProps.match.params.characterid)))
         }
+    }
+
+    openNewTab = () => {
+
     }
 
     render() {
@@ -69,51 +94,87 @@ class CharacterDetail extends Component {
 
         return (
             <div className={this.classes.root}>
-                <Paper className={this.classes.rootPaper} elevation={4}>
-                    <Typography variant="headline" component="h2">
-                        Character Detail
-    </Typography>
-                </Paper>
-
+                <Button className={this.classes.button} variant="raised" size="small" onClick={() => this.props.history.push('/characters')}>
+                    <KeyboardArrowLeft className={classNames(this.classes.leftIcon, this.classes.iconSmall)} />
+                    Back
+      </Button>
                 {Object.keys(character).length !== 0 && character.constructor === Object &&
+                    <Grid container spacing={24} style={{
+                        margin: 0,
+                        width: '100%',
+                    }}>
+                        <Grid item xs={12}>
+                            <Paper className={this.classes.paper}>
+                                <Typography variant="headline" component="h2">
+                                    <PersonIcon />{character.name}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grow in={true}>
+                            <Grid item xs={12} sm={6}>
+                                <Paper className={this.classes.paper}>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Also Known as: </span><ul>
+                                        {character.aliases.filter(item => item !== "").map(alias => <li key={alias}>{alias}</li>)}
+                                    </ul></Typography>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Titles: </span><ul>
+                                        {character.titles.filter(item => item !== "").map(title => <li key={title}>{title}</li>)}
+                                    </ul></Typography>
+                                    <TitleWithBody {...this.classes} title={'Born on: '} body={character.born}></TitleWithBody>
+                                    <TitleWithBody {...this.classes} title={'Gender: '} body={character.gender}></TitleWithBody>
+                                    <TitleWithBody {...this.classes} title={'Culture: '} body={character.culture}></TitleWithBody>
+                                    <TitleWithBody {...this.classes} title={'Father: '} body={character.father}></TitleWithBody>
+                                    <TitleWithBody {...this.classes} title={'Mother: '} body={character.mother}></TitleWithBody>
+                                    <TitleWithBody {...this.classes} title={'Spouse: '} body={character.spouse}></TitleWithBody>
+                                </Paper>
+                            </Grid>
+                        </Grow>
+                        <Grow in={true} timeout={500}>
+                            <Grid item xs={12} sm={6}>
+                                <Paper className={this.classes.paper}>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Allegiances: </span><ul>
+                                        {character.allegiances.map(allegiance => <li key={allegiance}>{allegiance}</li>)}
+                                    </ul></Typography>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Books: </span><ul>
+                                        {character.books.map(book => <li key={book}>{book}</li>)}
+                                    </ul></Typography>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>POV Books: </span><ul>
+                                        {character.povBooks.map(book => <li key={book}>{book}</li>)}
+                                    </ul></Typography>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>TV Series: </span><ul>
+                                        {character.tvSeries.filter(item => item !== "").map(series => <li key={series}>
 
-                    <Card className={this.classes.card}>
-                        <CardContent>
-                            <Typography variant="headline" component="h2">
-                                {character.name}
-                            </Typography>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Also Known as: </span><ul>
-                                {character.aliases.map(alias => <li key={alias}>{alias}</li>)}
-                            </ul></Typography>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Titles: </span><ul>
-                                {character.titles.map(title => <li key={title}>{title}</li>)}
-                            </ul></Typography>
-                            <TitleWithBody {...this.classes} title={'Born on: '} body={character.born}></TitleWithBody>
-                            <TitleWithBody {...this.classes} title={'Gender: '} body={character.gender}></TitleWithBody>
-                            <TitleWithBody {...this.classes} title={'Culture: '} body={character.culture}></TitleWithBody>
-                            <TitleWithBody {...this.classes} title={'Father: '} body={character.father}></TitleWithBody>
-                            <TitleWithBody {...this.classes} title={'Mother: '} body={character.mother}></TitleWithBody>
-                            <TitleWithBody {...this.classes} title={'Spouse: '} body={character.spouse}></TitleWithBody>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Allegiances: </span><ul>
-                                {character.allegiances.map(allegiance => <li key={allegiance}>{allegiance}</li>)}
-                            </ul></Typography>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Books: </span><ul>
-                                {character.books.map(book => <li key={book}>{book}</li>)}
-                            </ul></Typography>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>POV Books: </span><ul>
-                                {character.povBooks.map(book => <li key={book}>{book}</li>)}
-                            </ul></Typography>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>TV Series: </span><ul>
-                                {character.tvSeries.map(series => <li key={series}>{series}</li>)}
-                            </ul></Typography>
-                            <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Played By: </span><ul>
-                                {character.playedBy.map(played => <li key={played}><a target="_blank" href={'https://www.google.com/search?q=' + played}>{played}</a></li>)}
-                            </ul></Typography>
-                        </CardContent>
-                        {/* <CardActions>
-        <Button size="small">Learn More</Button>
-    </CardActions> */}
-                    </Card>
+                                            <Chip
+                                                avatar={
+                                                    <Avatar>
+                                                        <TvIcon />
+                                                    </Avatar>
+                                                }
+                                                label={series}
+                                                className={this.classes.chip}
+                                            />
+                                        </li>)}
+                                    </ul></Typography>
+                                    <Typography variant="subheading" gutterBottom><span className={this.classes.bold}>Played By: </span><ul>
+                                        {character.playedBy.filter(item => item !== "").map(played => <li key={played}>
+                                            {/* <Chip label={played} className={this.classes.chip} /> */}
+                                            <Chip
+                                                label={played}
+                                                avatar={
+                                                    <Avatar>
+                                                        <RecentActorsIcon />
+                                                    </Avatar>
+                                                }
+                                                onClick={() => window.open('https://www.google.com/search?q=' + played, '_blank')}
+                                                className={this.classes.chip}
+                                            />
+                                        </li>)}
+                                    </ul></Typography>
+                                </Paper>
+                            </Grid>
+                        </Grow>
+
+
+                    </Grid>
                 }
             </div>
         )

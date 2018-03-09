@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Card, { CardContent } from 'material-ui/Card';
+import HomeIcon from 'material-ui-icons/Home';
 
 import IceAndFireApiService from '../services/IceAndFireApiService';
 import IceAndFireUtils from '../utils/IceAndFireUtils';
@@ -116,7 +117,7 @@ class HouseDetail extends Component {
                     <Card className={this.classes.card}>
                         <CardContent>
                             <Typography variant="headline" component="h2">
-                                {house.name}
+                                <HomeIcon />{house.name}
                             </Typography>
                             <TitleWithBody {...this.classes} title={'Region: '} body={house.region}></TitleWithBody>
                             <TitleWithBody {...this.classes} title={'Founded: '} body={house.founded}></TitleWithBody>

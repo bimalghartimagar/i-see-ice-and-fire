@@ -5,6 +5,7 @@ import Typography from 'material-ui/Typography';
 import { withStyles } from 'material-ui/styles';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
+import { CircularProgress } from 'material-ui/Progress';
 
 import { fetchItemsIfNeeded } from '../actions/actions';
 import CustomList from '../components/CustomList';
@@ -19,6 +20,9 @@ const styles = theme => ({
     root: {
         width: '100%',
         backgroundColor: theme.palette.background.paper,
+    },
+    progress: {
+        margin: theme.spacing.unit * 2,
     },
 });
 
@@ -51,7 +55,7 @@ class House extends Component {
                         Houses {houses.length >= 0 && !isFetching && <Typography>Updated on: {(new Date(lastUpdated)).toLocaleString()}</Typography>}
                     </Typography>
                 </Paper>
-                {houses.length === 0 && isFetching && <div>Loading...</div>}
+                {houses.length === 0 && isFetching && <CircularProgress className={this.classes.progress} />}
                 {houses.length === 0 && !isFetching && <div>No houses found.</div>}
                 {houses.length >= 0 && <CustomList items={houses} passedIcon={PassedIcon} />}
             </div>

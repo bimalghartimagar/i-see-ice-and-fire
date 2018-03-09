@@ -6,6 +6,7 @@ import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 import { connect } from 'react-redux'
 import { selectedItem, fetchItemsIfNeeded } from '../actions/actions';
+import BookIcon from 'material-ui-icons/Book';
 
 const styles = theme => ({
     card: {
@@ -87,7 +88,7 @@ class BooksDetail extends Component {
                     <Card className={this.classes.card}>
                         <CardContent>
                             <Typography variant="headline" component="h2">
-                                {book.name}
+                                <BookIcon/>{book.name}
                             </Typography>
                             <Typography component="div" className={this.classes.pos}>Author(s): <ul>
                                 {book.authors.map(author => <li key={author}>{author}</li>)}

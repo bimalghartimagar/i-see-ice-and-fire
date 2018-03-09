@@ -9,7 +9,7 @@ import IceAndFireUtils from '../utils/IceAndFireUtils';
 
 const items = (
     state = {
-        idFetching: false,
+        isFetching: false,
         didInvalidate: false,
         items: []
     }, action) => {
@@ -21,14 +21,20 @@ const items = (
         case REQUEST_ITEMS:
             return Object.assign({}, state, {
                 isFetching: true,
-                didInvalidate: false
+                didInvalidate: false,
+                items: []
             })
         case RECEIVE_ITEMS:
             return Object.assign({}, state, {
                 isFetching: false,
                 didInvalidate: false,
                 items: action.items,
-                lastUpdated: action.receivedAt
+                lastUpdated: action.receivedAt,
+                next: action.next,
+                first: action.first,
+                last: action.last,
+                prev: action.prev,
+                current: action.current
             })
         default:
             return state

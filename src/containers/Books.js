@@ -5,6 +5,7 @@ import { withStyles } from 'material-ui/styles';
 import PropTypes from 'prop-types';
 import BookIcon from 'material-ui-icons/Book';
 import { connect } from 'react-redux'
+import { CircularProgress } from 'material-ui/Progress';
 
 import IceAndFireUtils from '../utils/IceAndFireUtils'
 import { fetchItemsIfNeeded } from '../actions/actions';
@@ -20,6 +21,9 @@ const styles = theme => ({
         width: '100%',
         backgroundColor: theme.palette.background.paper,
     },
+    progress: {
+        margin: theme.spacing.unit * 2,
+      },
 });
 
 
@@ -48,7 +52,7 @@ class Books extends Component {
                         Books {books.length >= 0 && !isFetching && <Typography>Updated on: {(new Date(lastUpdated)).toLocaleString()}</Typography>}
                     </Typography>
                 </Paper>
-                {books.length === 0 && isFetching && <div>Loading...</div>}
+                {books.length === 0 && isFetching && <CircularProgress className={this.classes.progress} />}
                 {books.length === 0 && !isFetching && <div>No books found.</div>}
                 {books.length >= 0 && <CustomList items={books} passedIcon={PassedIcon} />}
             </div>
@@ -68,7 +72,7 @@ const mapStateToProps = (state) => {
         items: []
     }
 
-    items.map(item => {
+    items.forEach(item => {
         item.url = IceAndFireUtils.getRouteUrl(item.url)
         return item
     })
