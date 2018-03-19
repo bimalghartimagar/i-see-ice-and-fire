@@ -2,7 +2,7 @@
   "name": "i-see-ice-and-fire",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://bimalghartimagar.github.io/i-see-ice-and-fire",
+  "homepage": "https://bimalghartimagar.github.io/i-see-ice-and-fire/",
   "dependencies": {
     "lodash": "^4.17.5",
     "material-design-icons": "^3.0.1",
