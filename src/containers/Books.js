@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import BookIcon from 'material-ui-icons/Book';
 import { connect } from 'react-redux'
 import { CircularProgress } from 'material-ui/Progress';
+import { LinearProgress } from 'material-ui/Progress';
 
 import IceAndFireUtils from '../utils/IceAndFireUtils'
 import { fetchItemsIfNeeded } from '../actions/actions';
@@ -47,14 +48,15 @@ class Books extends Component {
 
         return (
             <div className={this.classes.root}>
+                {isFetching && <LinearProgress color="secondary" />}
                 <Paper className={this.classes.rootPaper} elevation={4}>
                     <Typography variant="headline" component="h2">
                         Books {books.length >= 0 && !isFetching && <Typography>Updated on: {(new Date(lastUpdated)).toLocaleString()}</Typography>}
                     </Typography>
                 </Paper>
-                {books.length === 0 && isFetching && <CircularProgress className={this.classes.progress} />}
                 {books.length === 0 && !isFetching && <div>No books found.</div>}
-                {books.length >= 0 && <CustomList items={books} passedIcon={PassedIcon} />}
+                {books.length > 0 && <CustomList items={books} passedIcon={PassedIcon} />}
+                {books.length === 0 && isFetching && <CircularProgress className={this.classes.progress} />}
             </div>
         )
     }

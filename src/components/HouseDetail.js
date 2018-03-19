@@ -61,16 +61,15 @@ class HouseDetail extends Component {
     componentDidMount() {
 
         const { dispatch, match } = this.props
-        dispatch(fetchItemsIfNeeded('characters'))
-            .then(x => dispatch(fetchItemsIfNeeded('houses'))
-                .then(x => dispatch(selectedItem('houses', match.params.houseid))))
+        dispatch(fetchItemsIfNeeded('houses', null, match.params.houseid))
+            .then(x => dispatch(selectedItem('houses', match.params.houseid)))
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.match.params.houseid !== nextProps.match.params.houseid) {
 
             const { dispatch } = this.props
-            dispatch(fetchItemsIfNeeded('characters')).then(x => dispatch(selectedItem('houses', nextProps.match.params.houseid)))
+            dispatch(selectedItem('houses', nextProps.match.params.houseid))
         }
     }
 
@@ -132,12 +131,13 @@ class HouseDetail extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { selectedItem, itemsByType } = state
+    const { selectedItem } = state
 
     let house = selectedItem['houses'] || {}
     if (Object.keys(house).length !== 0 && house.constructor === Object) {
-        let currentLordNameArray = itemsByType['characters'].items.filter(item => IceAndFireUtils.getIdFromUrl(item.url) === IceAndFireUtils.getIdFromUrl(house.currentLord))
-        house.currentLordName = currentLordNameArray.length > 0 ? currentLordNameArray[0].name : ""
+        // let currentLordNameArray = itemsByType['characters'].items.filter(item => IceAndFireUtils.getIdFromUrl(item.url) === IceAndFireUtils.getIdFromUrl(house.currentLord))
+        // house.currentLordName = currentLordNameArray.length > 0 ? currentLordNameArray[0].name : ""
+        house.currentLordName = ""
     }
 
     return {

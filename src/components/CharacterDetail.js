@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { TitleWithBody } from './BooksDetail';
 import { withStyles } from 'material-ui/styles';
-import Card, { CardContent } from 'material-ui/Card';
+// import Card, { CardContent } from 'material-ui/Card';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 import { connect } from 'react-redux'
@@ -17,7 +17,7 @@ import Avatar from 'material-ui/Avatar';
 
 import RecentActorsIcon from 'material-ui-icons/RecentActors';
 
-import { fetchItemsIfNeeded, selectedItem, fetchItemIfNeeded } from '../actions/actions';
+import { selectedItem, fetchItemsIfNeeded } from '../actions/actions';
 
 const styles = theme => ({
     card: {
@@ -72,14 +72,15 @@ class CharacterDetail extends Component {
     componentDidMount() {
 
         const { dispatch, match } = this.props
-        dispatch(fetchItemIfNeeded('characters', match.params.characterid)).then(x => dispatch(selectedItem('characters', match.params.characterid)))
+        dispatch(fetchItemsIfNeeded('characters', "", match.params.characterid))
+        .then(x => dispatch(selectedItem('characters', match.params.characterid)))
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.match.params.characterid !== nextProps.match.params.characterid) {
 
             const { dispatch } = this.props
-            dispatch(fetchItemIfNeeded('characters', nextProps.match.params.characterid)).then(x => dispatch(selectedItem('characters', nextProps.match.params.characterid)))
+            dispatch(fetchItemsIfNeeded('characters', "", nextProps.match.params.characterid)).then(x => dispatch(selectedItem('characters', nextProps.match.params.characterid)))
         }
     }
 

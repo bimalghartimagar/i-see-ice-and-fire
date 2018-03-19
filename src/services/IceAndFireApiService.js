@@ -5,7 +5,7 @@ class IceAndFireApiService {
             'Accept': 'application/vnd.anapioficeandfire+json; version=1'
         }
     }
-    static getFireAndIceDetail(type, id = "", page = "1", pageSize = "25", queryParam = "") {
+    static getFireAndIceDetail(type, id = "", page = "", pageSize = "25", queryParam = "") {
         let url = `https://www.anapioficeandfire.com/api/${type}${"/" + id}${"?page=" + page + "&pageSize=" + pageSize}`;
 
         return fetch(url, this.requestObject).then(response => {

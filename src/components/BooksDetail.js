@@ -51,8 +51,8 @@ class BooksDetail extends Component {
     componentDidMount() {
 
         const { dispatch, match } = this.props
-        dispatch(fetchItemsIfNeeded('books'))
-            .then(
+        dispatch(fetchItemsIfNeeded('books', "", match.params.bookid))
+        .then(
                 response => dispatch(selectedItem('books', match.params.bookid))
             )
     }
