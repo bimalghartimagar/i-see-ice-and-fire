@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "https://bimalghartimagar.github.io/i-see-ice-and-fire/",
   "dependencies": {
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "material-ui": "^1.0.0-beta.34",
     "material-ui-icons": "^1.0.0-beta.17",
